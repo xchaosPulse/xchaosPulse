@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perspectives on Western Hegemony</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is structured as a thematic, interactive comparison tool rather than a linear report. The core is a three-column layout representing the 'Mainstream', 'Academic', and 'Critical' viewpoints. Users interact via a set of thematic filter buttons ('View of the Order', 'Core Arguments', etc.). Clicking a button dynamically updates the content in all three columns, allowing for direct, side-by-side comparison of how each perspective addresses that specific theme. This structure was chosen because the report's primary value lies in the contrasts and relationships between these schools of thought. A dynamic, comparative interface makes these complex relationships intuitive and explorable, promoting deeper understanding than a static, scrolling document would. The user flow is designed for discovery: land, understand the framework, then explore themes interactively. -->
+    <!-- Visualization & Content Choices: The report's content is entirely qualitative. Therefore, the 'visualizations' are structural and interactive rather than data-driven charts. 1) Main Viewpoints: Presented as three distinct columns (HTML/Tailwind Grid). Goal is comparison. Interaction involves content updates via JS. This is the clearest way to present three parallel narratives. 2) Thematic Filters: A group of buttons (HTML/JS). Goal is to organize and navigate the comparison. Interaction is clicking to trigger content swaps. This is a standard, user-friendly UI pattern for filtering. 3) Key Concepts (e.g., 'neo-Gramscian'): An interactive text element (HTML span with JS-powered modal). Goal is to provide layered information without cluttering the UI. This allows for in-context definitions. All interactions are handled with vanilla JavaScript, updating innerHTML from a structured data object. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F4; /* warm neutral */
+            color: #1F2937;
+        }
+        .perspective-card {
+            transition: all 0.3s ease-in-out;
+            min-height: 300px;
+        }
+        .filter-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .filter-btn.active {
+            background-color: #1E40AF; /* darker blue */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .keyword {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-decoration-color: #3B82F6;
+            font-weight: 500;
+        }
+        #modal {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight">Exploring Western Hegemony</h1>
+            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">An interactive guide to the key publications and perspectives on the U.S.-led liberal international order.</p>
+        </header>
+
+        <main>
+            <section id="interactive-perspectives" class="mb-16">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">Three Competing Views</h2>
+                    <p class="mt-2 text-md text-gray-500">Select a theme below to compare how each perspective interprets it.</p>
+                </div>
+
+                <div id="theme-filters" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-10">
+                    <button data-theme="view" class="filter-btn active text-sm md:text-base bg-white hover:bg-blue-100 text-blue-700 font-semibold py-2 px-4 border border-blue-200 rounded-lg shadow-sm">View of the World Order</button>
+                    <button data-theme="actors" class="filter-btn text-sm md:text-base bg-white hover:bg-blue-100 text-blue-700 font-semibold py-2 px-4 border border-blue-200 rounded-lg shadow-sm">Key Actors & Publications</button>
+                    <button data-theme="arguments" class="filter-btn text-sm md:text-base bg-white hover:bg-blue-100 text-blue-700 font-semibold py-2 px-4 border border-blue-200 rounded-lg shadow-sm">Core Arguments</button>
+                    <button data-theme="critique" class="filter-btn text-sm md:text-base bg-white hover:bg-blue-100 text-blue-700 font-semibold py-2 px-4 border border-blue-200 rounded-lg shadow-sm">Core Critique</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="perspective-card bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4">Mainstream & Policy-Oriented</h3>
+                        <div id="mainstream-content" class="text-gray-700 space-y-3"></div>
+                    </div>
+                    <div class="perspective-card bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-2xl font-bold text-green-800 mb-4">Scholarly & Academic</h3>
+                        <div id="academic-content" class="text-gray-700 space-y-3"></div>
+                    </div>
+                    <div class="perspective-card bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-2xl font-bold text-red-800 mb-4">Critical & Counter-Hegemonic</h3>
+                        <div id="critical-content" class="text-gray-700 space-y-3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="text-center border-t border-gray-200 pt-10">
+                <h2 class="text-3xl font-bold text-gray-800">A Layered Conversation</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">The discourse on Western hegemony is not a simple debate but a complex interplay of ideas about power, history, and ideology. While policy-oriented views focus on managing the current world order, academic and critical voices provide deep historical and theoretical insights into its origins, its maintenance, and the profound challenges it faces today. Understanding these different layers is crucial to grasping the intricate nature of global power dynamics.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div id="modal-content" class="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full relative">
+            <h4 id="modal-title" class="text-xl font-bold mb-2"></h4>
+            <p id="modal-text" class="text-gray-600"></p>
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const contentData = {
+                mainstream: {
+                    view: `The current U.S.-led order is the baseline for global stability. The primary goal is to maintain, adapt, or defend this system against emerging rivals and internal challenges.`,
+                    actors: `Prominent think tanks like the <strong>Council on Foreign Relations (CFR)</strong> and <strong>Chatham House</strong>. Their reports, such as "Competing visions of international order," shape policy discussions among Western governments.`,
+                    arguments: `This perspective acknowledges challenges from rising powers like China, Brazil, and Saudi Arabia, but frames them as problems to be managed within the existing framework. It focuses on geopolitical contests and the role of "middle powers."`,
+                    critique: `This view is critiqued for operating within a self-reinforcing framework that rarely questions the fundamental legitimacy or historical basis of the current order. It prioritizes stability over transformative change.`
+                },
+                academic: {
+                    view: `A complex debate exists. Some, like <strong>G. John Ikenberry</strong>, argue the <span class="keyword" data-key="lio">liberal international order</span>, despite flaws, has promoted stability through institutions and shared values. Others see it as a system of dominance.`,
+                    actors: `Academic journals and university presses. Key figures include liberal internationalists and critical scholars drawing from <span class="keyword" data-key="gramscian">neo-Gramscian</span> or <span class="keyword" data-key="postcolonial">post-colonial</span> theory.`,
+                    arguments: `Liberal scholars focus on how the order shapes U.S. foreign policy and fosters cooperation. Critical scholars analyze how U.S. think tanks construct threat narratives to legitimize dominance and maintain a system benefiting a ruling class.`,
+                    critique: `Hegemony is seen not just as military or economic power, but as the ability to shape global norms and ideas. The debate centers on whether the order is a public good or a tool of power.`
+                },
+                critical: {
+                    view: `Western hegemony is a modern form of colonialism and imperialism. The "West" is not seen as a benign force, and the current order perpetuates a <span class="keyword" data-key="eurocentric">Eurocentric worldview</span>.`,
+                    actors: `Scholars and writers offering a direct challenge, such as <strong>Amitav Acharya</strong> in "The Once and Future World Order." This work often comes from perspectives outside the traditional Western academic core.`,
+                    arguments: `The West's dominance was built on historical exploitation. "Anglo-Saxon hegemony" is rooted in specific psychological, material, and racial ideologies that have shaped global power dynamics for centuries.`,
+                    critique: `This perspective explicitly labels Western dominance as a form of <span class="keyword" data-key="culturalviolence">"cultural violence"</span> that enforces a particular worldview, marginalizes other civilizations, and maintains an unjust global social hierarchy.`
+                }
+            };
+
+            const keywordDefinitions = {
+                lio: {
+                    title: 'Liberal International Order',
+                    text: 'A term for the system of international institutions, alliances, and norms led by the United States and its allies after World War II. It emphasizes free trade, democratic values, and rule-based international relations.'
+                },
+                gramscian: {
+                    title: 'Neo-Gramscian Theory',
+                    text: 'An approach in international relations inspired by Antonio Gramsci. It argues that hegemony is not just maintained by force (coercion), but also by consent, achieved when dominant ideas and norms are accepted as common sense by the wider population.'
+                },
+                postcolonial: {
+                    title: 'Post-Colonial Theory',
+                    text: 'A critical perspective that examines the lasting cultural, political, and economic legacy of colonialism and imperialism. It challenges the Western-centric narratives of history and global power.'
+                },
+                eurocentric: {
+                    title: 'Eurocentric Worldview',
+                    text: 'A perspective that implicitly or explicitly places European (and more broadly, Western) culture, history, and values at the center of world affairs, often treating them as the universal standard.'
+                },
+                culturalviolence: {
+                    title: 'Cultural Violence',
+                    text: 'A term describing the aspects of a culture that can be used to legitimize direct or structural violence. It refers to the ways in which dominant ideologies, art, language, and science can be used to make inequality and oppression seem natural or invisible.'
+                }
+            };
+
+            const mainstreamContent = document.getElementById('mainstream-content');
+            const academicContent = document.getElementById('academic-content');
+            const criticalContent = document.getElementById('critical-content');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const modalClose = document.getElementById('modal-close');
+
+            function updateContent(theme) {
+                mainstreamContent.innerHTML = `<p>${contentData.mainstream[theme]}</p>`;
+                academicContent.innerHTML = `<p>${contentData.academic[theme]}</p>`;
+                criticalContent.innerHTML = `<p>${contentData.critical[theme]}</p>`;
+                addKeywordListeners();
+            }
+
+            function setActiveButton(activeButton) {
+                filterButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                activeButton.classList.add('active');
+            }
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const theme = button.dataset.theme;
+                    updateContent(theme);
+                    setActiveButton(button);
+                });
+            });
+            
+            function openModal(key) {
+                const definition = keywordDefinitions[key];
+                if (definition) {
+                    modalTitle.textContent = definition.title;
+                    modalText.textContent = definition.text;
+                    modal.classList.remove('hidden');
+                }
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+            }
+
+            function addKeywordListeners() {
+                document.querySelectorAll('.keyword').forEach(span => {
+                    span.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const key = e.target.dataset.key;
+                        openModal(key);
+                    });
+                });
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            updateContent('view');
+        });
+    </script>
+</body>
+</html>
